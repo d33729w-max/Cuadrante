@@ -5,133 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuadrante</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div id="auth-section" class="screen">
-        <h1 class="auth-title">Inicia sesión para continuar</h1>
-        <button id="google-login-btn" class="google-btn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
-            Iniciar sesión con Google
-        </button>
-        <div id="auth-alerts" class="alert-message"></div>
-    </div>
-
-    <div id="onboarding-modal" class="modal-container hidden">
+    <div id="onboarding-modal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">¡Bienvenido!</h2>
-            <p>Parece que es tu primera vez aquí. ¿Qué quieres hacer?</p>
-            <div class="onboarding-options">
-                <button id="create-new-squad-btn" class="onboarding-btn">Crear un nuevo cuadrante</button>
-                <button id="join-existing-squad-btn" class="onboarding-btn">Unirme a uno existente</button>
+            <h1>Bienvenido a Cuadrante</h1>
+            <p>Elige una opción para empezar:</p>
+            <div class="button-container">
+                <button id="create-new-squad-btn">Crear Cuadrante</button>
+                <button id="join-existing-squad-btn">Unirme a un Cuadrante</button>
             </div>
         </div>
     </div>
 
-    <div id="pending-modal" class="modal-container hidden">
-        <div class="modal-content">
-            <h2 class="modal-title">Solicitud enviada</h2>
-            <p>Hemos enviado una solicitud al administrador del cuadrante. Por favor, espera a que te apruebe.</p>
-        </div>
-    </div>
-
-    <div id="admin-section" class="screen hidden">
-        <div class="header">
-            <div class="user-info">
-                <span>Sesión iniciada como: <strong id="current-user-display"></strong></span>
-                <span id="app-version-display"></span>
-            </div>
-            <button id="logout-btn" class="logout-btn">Cerrar sesión</button>
-        </div>
-        <div class="content-panel">
-            <h2>Panel de Administrador</h2>
-            <div class="admin-grid">
-                <div class="admin-card">
-                    <h3>Crear Nuevo Cuadrante</h3>
-                    <input type="text" id="squad-name-input" placeholder="Nombre del cuadrante">
-                    <input type="text" id="admin-name-input" placeholder="Tu nombre como administrador">
-                    <input type="text" id="cadencia-input" placeholder="Ej: L,L,N,N,T,D,D">
-                    <input type="date" id="start-date-turnos">
-                    <button id="create-squad-btn">Crear</button>
-                </div>
-                <div class="admin-card">
-                    <h3>Añadir Miembro</h3>
-                    <input type="text" id="new-member-input" placeholder="Nombre del nuevo miembro">
-                    <button id="add-member-btn">Añadir</button>
-                    <ul id="member-list"></ul>
-                </div>
-                <div class="admin-card">
-                    <h3>Solicitudes Pendientes</h3>
-                    <ul id="pending-requests-list"></ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="calendar-section" class="screen hidden">
-        <div class="header">
-            <div class="user-info">
-                <span>Sesión iniciada como: <strong id="current-user-display-2"></strong></span>
+    <div id="admin-section" class="main-container hidden">
+        <header>
+            <h1>Gestión de Cuadrante</h1>
+            <button id="logout-btn-2" class="logout-btn">Salir</button>
+            <div class="version-display">
                 <span id="app-version-display-2"></span>
+                <span id="current-user-display-2"></span>
             </div>
-            <button id="logout-btn-2" class="logout-btn">Cerrar sesión</button>
-        </div>
-        <div class="calendar-nav">
-            <button id="prev-month">Anterior</button>
-            <h2 id="current-month-year"></h2>
-            <button id="next-month">Siguiente</button>
-        </div>
-        <div class="calendar-grid"></div>
+        </header>
+        <main>
+            <section id="create-squad-section">
+                <h2>Crear un nuevo Cuadrante</h2>
+                <div class="form-group">
+                    <label for="squad-name-input">Nombre del Cuadrante:</label>
+                    <input type="text" id="squad-name-input">
+                </div>
+                <div class="form-group">
+                    <label for="admin-name-input">Tu nombre:</label>
+                    <input type="text" id="admin-name-input">
+                </div>
+                <div class="form-group">
+                    <label for="cadencia-input">Cadencia de turnos (Ej: 1,2,3):</label>
+                    <input type="text" id="cadencia-input">
+                </div>
+                <div class="form-group">
+                    <label for="start-date-turnos">Fecha de inicio de turnos:</label>
+                    <input type="date" id="start-date-turnos">
+                </div>
+                <button id="create-squad-btn">Crear Cuadrante</button>
+                <p>Una vez creado, comparte el código del cuadrante con tus compañeros para que puedan unirse.</p>
+            </section>
+
+            <section id="manage-members-section">
+                <h2>Miembros del Cuadrante</h2>
+                <ul id="member-list"></ul>
+                <div class="form-group">
+                    <label for="new-member-input">Añadir miembro manualmente:</label>
+                    <input type="text" id="new-member-input" placeholder="Nombre del miembro">
+                    <button id="add-member-btn">Añadir</button>
+                </div>
+            </section>
+
+            <section id="pending-requests-section">
+                <h2>Solicitudes Pendientes</h2>
+                <ul id="pending-requests-list"></ul>
+            </section>
+        </main>
     </div>
 
-    <div id="day-details-modal" class="modal-container hidden">
+    <div id="calendar-section" class="main-container hidden">
+        <header>
+            <h1>Calendario de Turnos</h1>
+            <button id="logout-btn" class="logout-btn">Salir</button>
+            <div class="version-display">
+                <span id="app-version-display"></span>
+                <span id="current-user-display"></span>
+            </div>
+        </header>
+        <main>
+            <section class="calendar-nav">
+                <button id="prev-month">Anterior</button>
+                <h2 id="current-month-year"></h2>
+                <button id="next-month">Siguiente</button>
+            </section>
+            <section class="calendar-container">
+                <div class="weekday-header">Lun</div>
+                <div class="weekday-header">Mar</div>
+                <div class="weekday-header">Mié</div>
+                <div class="weekday-header">Jue</div>
+                <div class="weekday-header">Vie</div>
+                <div class="weekday-header">Sáb</div>
+                <div class="weekday-header">Dom</div>
+                <div id="calendar-grid" class="calendar-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="day-details-modal" class="modal hidden">
         <div class="modal-content">
+            <span class="close-button">&times;</span>
             <h2 id="day-details-title"></h2>
             <div id="day-details-info"></div>
-            <div class="modal-actions">
-                <button id="manage-absences-btn">Gestionar Ausencias</button>
-                <button class="close-button">Cerrar</button>
-            </div>
+            <button id="manage-absences-btn">Gestionar Ausencias</button>
         </div>
     </div>
 
-    <div id="single-day-modal" class="modal-container hidden">
+    <div id="single-day-modal" class="modal hidden">
         <div class="modal-content">
-            <h2 class="modal-title">Añadir/Eliminar Ausencia</h2>
-            <form id="absence-form">
+            <span id="close-single-day-modal" class="close-button">&times;</span>
+            <h2>Gestión de Ausencias</h2>
+            <div id="modal-alerts" class="alerts"></div>
+            <div class="form-group">
                 <label for="person-name-day">Persona:</label>
                 <select id="person-name-day"></select>
-                
+            </div>
+            <div class="form-group">
                 <label for="absence-type-day">Tipo de Ausencia:</label>
                 <select id="absence-type-day">
-                    <option value="solicitud-vacaciones">Solicitud de Vacaciones</option>
-                    <option value="vacaciones">Vacaciones</option>
-                    <option value="solicitud-asuntos-particulares">Solicitud Asuntos Particulares</option>
-                    <option value="asuntos-particulares">Asuntos Particulares</option>
-                    <option value="juicio">Juicio</option>
-                    <option value="comision-servicio">Comisión de Servicio</option>
-                    <option value="tiro">Tiro</option>
-                    <option value="reconocimiento-medico">Reconocimiento Médico</option>
-                    <option value="baja-medica">Baja Médica</option>
-                    <option value="indisposicion">Indisposición</option>
+                    <option value="Vacaciones">Vacaciones</option>
+                    <option value="Libre">Día Libre</option>
+                    <option value="Enfermedad">Enfermedad</option>
                 </select>
-
-                <label for="start-date-modal">Fecha de inicio:</label>
-                <input type="date" id="start-date-modal" required>
-
-                <label for="end-date-modal">Fecha de fin:</label>
-                <input type="date" id="end-date-modal" required>
-
-                <div class="modal-alerts" id="modal-alerts"></div>
-            </form>
-            <div class="modal-actions">
-                <button id="save-modal-btn">Guardar</button>
-                <button id="delete-modal-btn">Eliminar</button>
-                <button id="close-single-day-modal" class="close-button">Cancelar</button>
             </div>
+            <div class="form-group">
+                <label for="start-date-modal">Fecha de inicio:</label>
+                <input type="date" id="start-date-modal">
+            </div>
+            <div class="form-group">
+                <label for="end-date-modal">Fecha de fin:</label>
+                <input type="date" id="end-date-modal">
+            </div>
+            <button id="save-modal-btn">Guardar</button>
+            <button id="delete-modal-btn">Eliminar</button>
         </div>
     </div>
-    
-    <script src="script.js" type="module"></script>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
