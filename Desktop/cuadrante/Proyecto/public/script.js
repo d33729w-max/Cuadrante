@@ -1,11 +1,11 @@
 // Importa las funciones que necesitas
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, query, where, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Tu configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCPMQBgYe3hsytMqyJ_T-wiYoSJTNtuwD0",
+    apiKey: "AIzaSyACVtnku9tk4SoQ_aQHRA3einY7vkXfedg",
     authDomain: "cuadrante-64e6c.firebaseapp.com",
     projectId: "cuadrante-64e6c",
     storageBucket: "cuadrante-64e6c.firebasestorage.app",
