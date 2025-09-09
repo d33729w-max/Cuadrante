@@ -15,7 +15,6 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Variables y constantes del DOM
@@ -58,13 +57,7 @@ const modalAlerts = document.getElementById('modal-alerts');
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth();
 const currentDay = new Date().getDate();
-const currentSquadId = localStorage.getItem('currentSquadId');
-const currentUserId = localStorage.getItem('currentUserId');
-const currentUserName = localStorage.getItem('currentUserName');
 let isSquadAdmin = false;
-const currentSquadName = localStorage.getItem('currentSquadName');
-const currentSquadCadencia = localStorage.getItem('currentSquadCadencia');
-const currentSquadStartDate = localStorage.getItem('currentSquadStartDate');
 const appVersion = "0.0.1";
 const appVersionDisplay = document.getElementById('app-version-display');
 const appVersionDisplay2 = document.getElementById('app-version-display-2');
@@ -77,6 +70,15 @@ const startDateTurnos = document.getElementById('start-date-turnos');
 let selectedMonth = new Date().getMonth();
 let selectedYear = new Date().getFullYear();
 let currentViewDate = new Date();
+
+// *** IMPORTANTE: Se ha eliminado la autenticación para acceso directo ***
+// Las siguientes variables simulan un usuario y un escuadrón para fines de demostración
+const currentUserId = "dummy-user-id";
+const currentUserName = "Usuario de Prueba";
+let currentSquadId = localStorage.getItem('currentSquadId');
+let currentSquadName = localStorage.getItem('currentSquadName');
+let currentSquadCadencia = localStorage.getItem('currentSquadCadencia');
+let currentSquadStartDate = localStorage.getItem('currentSquadStartDate');
 
 // Ocultar todas las secciones excepto la de autenticación al inicio
 function hideAllSections() {
@@ -92,86 +94,32 @@ function showAuthSection() {
 }
 
 // Mostrar la sección de administrador o calendario
-function showMainSection(user) {
+function showMainSection() {
     hideAllSections();
-    if (user && isSquadAdmin) {
+    if (isSquadAdmin) {
         adminSection.classList.remove('hidden');
     } else {
         calendarSection.classList.remove('hidden');
     }
 }
 
-// Manejar el inicio de sesión
-googleLoginBtn.addEventListener('click', async () => {
-    try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-    } catch (error) {
-        console.error("Error al iniciar sesión con Google:", error);
-        authAlerts.textContent = "Error al iniciar sesión. Inténtalo de nuevo.";
-    }
-});
-
-// Manejar el cierre de sesión
-logoutBtn.addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-    } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-    }
-});
-
-logoutBtn2.addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-    } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-    }
-});
-
-// Comprobar el estado de autenticación
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        console.log("Usuario autenticado:", user.uid, user.displayName);
-        localStorage.setItem('currentUserId', user.uid);
-        localStorage.setItem('currentUserName', user.displayName);
-        currentUserDisplay.textContent = user.displayName;
-        currentUserDisplay2.textContent = user.displayName;
-
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            const userData = userSnap.data();
-            console.log("Datos del usuario existentes:", userData);
-
-            if (userData.squadId) {
-                localStorage.setItem('currentSquadId', userData.squadId);
-                await checkUserRole(user.uid, userData.squadId);
-                showMainSection(user);
-            } else if (userData.pendingRequest) {
-                showPendingModal();
-            } else {
-                showOnboardingModal();
-            }
-        } else {
-            console.log("Nuevo usuario. Creando documento...");
-            await setDoc(userRef, {
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName,
-                squadId: null,
-                role: 'user',
-                pendingRequest: false
-            });
-            showOnboardingModal();
-        }
+// ** El siguiente código se encarga de mostrar la interfaz sin autenticación **
+// *** IMPORTANTE: Esta es una solución temporal para el despliegue sin autenticación.
+async function showInitialScreen() {
+    if (currentSquadId) {
+        await checkUserRole(currentUserId, currentSquadId);
+        showMainSection();
     } else {
-        console.log("Usuario no autenticado. Mostrando sección de autenticación.");
-        localStorage.clear();
-        showAuthSection();
+        showOnboardingModal();
     }
-});
+}
+showInitialScreen();
+
+// Funciones de Login y Logout deshabilitadas en esta versión
+if (googleLoginBtn) googleLoginBtn.classList.add('hidden');
+if (logoutBtn) logoutBtn.classList.add('hidden');
+if (logoutBtn2) logoutBtn2.classList.add('hidden');
+
 
 function showOnboardingModal() {
     hideAllSections();
@@ -192,12 +140,13 @@ async function checkUserRole(userId, squadId) {
         localStorage.setItem('currentSquadName', squadData.name);
         localStorage.setItem('currentSquadCadencia', squadData.cadencia);
         localStorage.setItem('currentSquadStartDate', squadData.startDate);
+        currentSquadName = squadData.name;
+        currentSquadCadencia = squadData.cadencia;
+        currentSquadStartDate = squadData.startDate;
         if (squadData.adminUid === userId) {
             isSquadAdmin = true;
-            console.log("El usuario es administrador.");
         } else {
             isSquadAdmin = false;
-            console.log("El usuario no es administrador.");
         }
     }
 }
@@ -214,12 +163,12 @@ joinExistingSquadBtn.addEventListener('click', async () => {
         const squadRef = doc(db, "squads", squadCode);
         const squadSnap = await getDoc(squadRef);
         if (squadSnap.exists()) {
-            const userRef = doc(db, "users", auth.currentUser.uid);
+            const userRef = doc(db, "users", currentUserId);
             await updateDoc(userRef, {
                 pendingRequest: true
             });
             await updateDoc(squadRef, {
-                pendingMembers: arrayUnion({ uid: auth.currentUser.uid, name: auth.currentUser.displayName })
+                pendingMembers: arrayUnion({ uid: currentUserId, name: currentUserName })
             });
             alert("Solicitud enviada. Espera la aprobación del administrador.");
             window.location.reload();
@@ -243,16 +192,20 @@ createSquadBtn.addEventListener('click', async () => {
                 name: squadName,
                 cadencia: cadencia,
                 startDate: startDate,
-                adminUid: auth.currentUser.uid,
+                adminUid: currentUserId,
                 adminName: adminName,
-                members: [{ uid: auth.currentUser.uid, name: adminName }],
+                members: [{ uid: currentUserId, name: adminName }],
                 pendingMembers: []
             });
 
-            const userRef = doc(db, "users", auth.currentUser.uid);
-            await updateDoc(userRef, {
+            const userRef = doc(db, "users", currentUserId);
+            await setDoc(userRef, {
+                uid: currentUserId,
+                email: "demo@example.com",
+                name: adminName,
                 squadId: newSquadRef.id,
-                role: 'admin'
+                role: 'admin',
+                pendingRequest: false
             });
 
             localStorage.setItem('currentSquadId', newSquadRef.id);
@@ -260,6 +213,7 @@ createSquadBtn.addEventListener('click', async () => {
             localStorage.setItem('currentSquadCadencia', cadencia);
             localStorage.setItem('currentSquadStartDate', startDate);
             isSquadAdmin = true;
+            currentSquadId = newSquadRef.id;
 
             alert("¡Cuadrante creado con éxito!");
             window.location.reload();
@@ -275,135 +229,131 @@ createSquadBtn.addEventListener('click', async () => {
 
 // Gestión de Miembros y Solicitudes
 if (addMemberBtn) {
+    onSnapshot(doc(db, "squads", currentSquadId), (docSnap) => {
+        if (docSnap.exists()) {
+            const squadData = docSnap.data();
+            if (memberList) {
+                memberList.innerHTML = '';
+                squadData.members.forEach(member => {
+                    const li = document.createElement('li');
+                    li.textContent = member.name;
+                    memberList.appendChild(li);
+                });
+            }
+            if (pendingRequestsList && squadData.pendingMembers && isSquadAdmin) {
+                pendingRequestsList.innerHTML = '';
+                squadData.pendingMembers.forEach(member => {
+                    const li = document.createElement('li');
+                    li.textContent = member.name;
+                    const approveBtn = document.createElement('button');
+                    approveBtn.textContent = 'Aprobar';
+                    approveBtn.addEventListener('click', async () => {
+                        const memberRef = doc(db, "users", member.uid);
+                        await updateDoc(memberRef, {
+                            squadId: currentSquadId,
+                            pendingRequest: false
+                        });
+                        await updateDoc(doc(db, "squads", currentSquadId), {
+                            members: arrayUnion({ uid: member.uid, name: member.name }),
+                            pendingMembers: arrayRemove({ uid: member.uid, name: member.name })
+                        });
+                    });
+                    li.appendChild(approveBtn);
+                    pendingRequestsList.appendChild(li);
+                });
+            }
+        }
+    });
+
     addMemberBtn.addEventListener('click', async () => {
         const newMemberName = newMemberInput.value.trim();
         if (newMemberName) {
-            const userRef = doc(db, "users", auth.currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists() && userSnap.data().squadId) {
-                const squadRef = doc(db, "squads", userSnap.data().squadId);
-                await updateDoc(squadRef, {
-                    members: arrayUnion({ uid: 'manual-' + Date.now(), name: newMemberName })
-                });
-                newMemberInput.value = '';
-            }
+            const squadRef = doc(db, "squads", currentSquadId);
+            await updateDoc(squadRef, {
+                members: arrayUnion({ uid: 'manual-' + Date.now(), name: newMemberName })
+            });
+            newMemberInput.value = '';
         }
     });
 }
 
-// Sincronizar UI con la base de datos en tiempo real
-onSnapshot(doc(db, "squads", currentSquadId), (docSnap) => {
-    if (docSnap.exists()) {
-        const squadData = docSnap.data();
-        if (memberList) {
-            memberList.innerHTML = '';
-            squadData.members.forEach(member => {
-                const li = document.createElement('li');
-                li.textContent = member.name;
-                memberList.appendChild(li);
-            });
-        }
-        if (pendingRequestsList && squadData.pendingMembers && isSquadAdmin) {
-            pendingRequestsList.innerHTML = '';
-            squadData.pendingMembers.forEach(member => {
-                const li = document.createElement('li');
-                li.textContent = member.name;
-                const approveBtn = document.createElement('button');
-                approveBtn.textContent = 'Aprobar';
-                approveBtn.addEventListener('click', async () => {
-                    const memberRef = doc(db, "users", member.uid);
-                    await updateDoc(memberRef, {
-                        squadId: currentSquadId,
-                        pendingRequest: false
-                    });
-                    await updateDoc(doc(db, "squads", currentSquadId), {
-                        members: arrayUnion({ uid: member.uid, name: member.name }),
-                        pendingMembers: arrayRemove({ uid: member.uid, name: member.name })
-                    });
-                });
-                li.appendChild(approveBtn);
-                pendingRequestsList.appendChild(li);
-            });
-        }
-    }
-});
-
 // Lógica del Calendario
-if (calendarGrid) {
-    function generateCalendar(month, year) {
-        calendarGrid.innerHTML = '';
-        currentMonthYearHeader.textContent = `${getMonthName(month)} ${year}`;
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startDayOfWeek = firstDay.getDay();
-        const dates = [];
+function generateCalendar(month, year) {
+    if (!calendarGrid) return; // Salir si el elemento no existe
+    calendarGrid.innerHTML = '';
+    currentMonthYearHeader.textContent = `${getMonthName(month)} ${year}`;
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay();
+    const dates = [];
 
-        // Días del mes anterior para rellenar
-        const prevMonthLastDay = new Date(year, month, 0);
-        const prevDaysInMonth = prevMonthLastDay.getDate();
-        for (let i = startDayOfWeek - 1; i >= 0; i--) {
-            dates.push({ day: prevDaysInMonth - i, type: 'other-month' });
+    // Días del mes anterior para rellenar
+    const prevMonthLastDay = new Date(year, month, 0);
+    const prevDaysInMonth = prevMonthLastDay.getDate();
+    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+        dates.push({ day: prevDaysInMonth - i, type: 'other-month' });
+    }
+
+    // Días del mes actual
+    for (let i = 1; i <= daysInMonth; i++) {
+        dates.push({ day: i, type: 'current-month', date: new Date(year, month, i) });
+    }
+
+    // Días del mes siguiente para rellenar
+    let nextDay = 1;
+    while (dates.length % 7 !== 0) {
+        dates.push({ day: nextDay, type: 'other-month' });
+        nextDay++;
+    }
+
+    dates.forEach((dateInfo, index) => {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('day');
+        dayElement.textContent = dateInfo.day;
+        if (dateInfo.type === 'other-month') {
+            dayElement.classList.add('other-month-day');
+        } else {
+            dayElement.addEventListener('click', () => showDayDetails(dateInfo.date));
         }
-
-        // Días del mes actual
-        for (let i = 1; i <= daysInMonth; i++) {
-            dates.push({ day: i, type: 'current-month', date: new Date(year, month, i) });
-        }
-
-        // Días del mes siguiente para rellenar
-        let nextDay = 1;
-        while (dates.length % 7 !== 0) {
-            dates.push({ day: nextDay, type: 'other-month' });
-            nextDay++;
-        }
-
-        dates.forEach((dateInfo, index) => {
-            const dayElement = document.createElement('div');
-            dayElement.classList.add('day');
-            dayElement.textContent = dateInfo.day;
-            if (dateInfo.type === 'other-month') {
-                dayElement.classList.add('other-month-day');
-            } else {
-                dayElement.addEventListener('click', () => showDayDetails(dateInfo.date));
+        // Lógica de turnos y ausencias
+        if (dateInfo.type === 'current-month' && currentSquadCadencia) {
+            const turnos = currentSquadCadencia.split(',');
+            const startDateParts = currentSquadStartDate.split('-');
+            const startDate = new Date(startDateParts[0], startDateParts[1] - 1, startDateParts[2]);
+            const diffTime = dateInfo.date.getTime() - startDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays >= 0) {
+                const turnoIndex = diffDays % turnos.length;
+                const turno = turnos[turnoIndex];
+                const turnoSpan = document.createElement('span');
+                turnoSpan.classList.add('turno');
+                turnoSpan.textContent = turno;
+                dayElement.appendChild(turnoSpan);
             }
-            // Lógica de turnos y ausencias
-            if (dateInfo.type === 'current-month' && currentSquadCadencia) {
-                const turnos = currentSquadCadencia.split(',');
-                const startDateParts = currentSquadStartDate.split('-');
-                const startDate = new Date(startDateParts[0], startDateParts[1] - 1, startDateParts[2]);
-                const diffTime = dateInfo.date.getTime() - startDate.getTime();
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                if (diffDays >= 0) {
-                    const turnoIndex = diffDays % turnos.length;
-                    const turno = turnos[turnoIndex];
-                    const turnoSpan = document.createElement('span');
-                    turnoSpan.classList.add('turno');
-                    turnoSpan.textContent = turno;
-                    dayElement.appendChild(turnoSpan);
-                }
-            }
-            calendarGrid.appendChild(dayElement);
-        });
-        
-        getAbsences(month, year);
-    }
+        }
+        calendarGrid.appendChild(dayElement);
+    });
+    
+    getAbsences(month, year);
+}
 
-    function getMonthName(month) {
-        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        return monthNames[month];
-    }
+function getMonthName(month) {
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    return monthNames[month];
+}
 
-    function showDayDetails(date) {
-        dayDetailsTitle.textContent = date.toLocaleDateString();
-        dayDetailsInfo.innerHTML = '';
-        dayDetailsModal.classList.remove('hidden');
-    }
+function showDayDetails(date) {
+    dayDetailsTitle.textContent = date.toLocaleDateString();
+    dayDetailsInfo.innerHTML = '';
+    dayDetailsModal.classList.remove('hidden');
+}
 
-    function updateCalendarNav() {
-        currentMonthYearHeader.textContent = `${getMonthName(selectedMonth)} ${selectedYear}`;
-    }
+function updateCalendarNav() {
+    currentMonthYearHeader.textContent = `${getMonthName(selectedMonth)} ${selectedYear}`;
+}
 
+if (prevMonthBtn) {
     prevMonthBtn.addEventListener('click', () => {
         selectedMonth--;
         if (selectedMonth < 0) {
@@ -412,7 +362,8 @@ if (calendarGrid) {
         }
         generateCalendar(selectedMonth, selectedYear);
     });
-
+}
+if (nextMonthBtn) {
     nextMonthBtn.addEventListener('click', () => {
         selectedMonth++;
         if (selectedMonth > 11) {
@@ -421,35 +372,41 @@ if (calendarGrid) {
         }
         generateCalendar(selectedMonth, selectedYear);
     });
+}
 
-    // Lógica para ausencias
-    async function getAbsences(month, year) {
-        if (!currentSquadId) return;
-        const startOfMonth = new Date(year, month, 1);
-        const endOfMonth = new Date(year, month + 1, 0);
-        const absencesRef = collection(db, "squads", currentSquadId, "absences");
-        const q = query(absencesRef, where("date", ">=", startOfMonth), where("date", "<=", endOfMonth));
+// Lógica para ausencias
+async function getAbsences(month, year) {
+    if (!currentSquadId) return;
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, month + 1, 0);
+    const absencesRef = collection(db, "squads", currentSquadId, "absences");
+    const q = query(absencesRef, where("date", ">=", startOfMonth), where("date", "<=", endOfMonth));
 
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            const absenceData = doc.data();
-            const absenceDate = absenceData.date.toDate();
-            const dayElement = document.querySelector(`.day:not(.other-month-day)`);
-            if (dayElement && absenceDate.getDate() === parseInt(dayElement.textContent)) {
-                dayElement.classList.add('has-absence');
-            }
-        });
-    }
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        const absenceData = doc.data();
+        const absenceDate = absenceData.date.toDate();
+        const dayElement = document.querySelector(`.day:not(.other-month-day)`);
+        if (dayElement && absenceDate.getDate() === parseInt(dayElement.textContent)) {
+            dayElement.classList.add('has-absence');
+        }
+    });
+}
 
+if (manageAbsencesBtn) {
     manageAbsencesBtn.addEventListener('click', () => {
         dayDetailsModal.classList.add('hidden');
         singleDayModal.classList.remove('hidden');
     });
+}
 
+if (closeSingleDayModal) {
     closeSingleDayModal.addEventListener('click', () => {
         singleDayModal.classList.add('hidden');
     });
+}
 
+if (saveModalBtn) {
     saveModalBtn.addEventListener('click', async () => {
         const personName = personNameDaySelect.value;
         const absenceType = absenceTypeDaySelect.value;
@@ -480,7 +437,9 @@ if (calendarGrid) {
             singleDayModal.classList.add('hidden');
         }, 1500);
     });
+}
 
+if (deleteModalBtn) {
     deleteModalBtn.addEventListener('click', async () => {
         const personName = personNameDaySelect.value;
         const startDate = new Date(startDateModal.value);
@@ -506,26 +465,26 @@ if (calendarGrid) {
             singleDayModal.classList.add('hidden');
         }, 1500);
     });
+}
 
-    // Llenar el selector de personas
-    if (personNameDaySelect) {
-        const squadRef = doc(db, "squads", currentSquadId);
-        onSnapshot(squadRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const squadData = docSnap.data();
-                personNameDaySelect.innerHTML = '';
-                squadData.members.forEach(member => {
-                    const option = document.createElement('option');
-                    option.value = member.name;
-                    option.textContent = member.name;
-                    personNameDaySelect.appendChild(option);
-                });
-            }
-        });
-    }
+// Llenar el selector de personas
+if (personNameDaySelect) {
+    const squadRef = doc(db, "squads", currentSquadId);
+    onSnapshot(squadRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const squadData = docSnap.data();
+            personNameDaySelect.innerHTML = '';
+            squadData.members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.name;
+                option.textContent = member.name;
+                personNameDaySelect.appendChild(option);
+            });
+        }
+    });
+}
 
-    // Inicializar el calendario si el usuario ya está en un escuadrón
-    if (currentSquadId) {
-        generateCalendar(selectedMonth, selectedYear);
-    }
+// Inicializar el calendario si el usuario ya está en un escuadrón
+if (currentSquadId) {
+    generateCalendar(selectedMonth, selectedYear);
 }
