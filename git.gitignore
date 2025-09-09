@@ -1,0 +1,24 @@
+# Archivos de configuración de Firebase CLI
+.firebaserc
+firebase.json
+.firebase/
+
+# Directorio de los módulos de Node.js
+node_modules/
+
+# Archivos de entorno y seguridad
+.env
+*.pem
+*.key
+
+# Archivos de configuración y temporales del sistema
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.idea/
+.vscode/
+
+# Build artifacts
+dist/
+build/

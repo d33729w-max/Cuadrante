@@ -1,0 +1,241 @@
+/* Base Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    color: #0056b3;
+    margin-bottom: 15px;
+}
+
+/* General Containers */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.main-section {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.hidden {
+    display: none !important;
+}
+
+/* Login & Member Sections */
+#auth-section, #admin-section {
+    padding: 40px;
+    text-align: center;
+}
+#auth-section input, #auth-section button,
+#admin-section input, #admin-section button {
+    display: block;
+    width: 80%;
+    max-width: 300px;
+    margin: 0 auto 15px;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+#auth-section button, #admin-section button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#auth-section button:hover, #admin-section button:hover {
+    background-color: #0056b3;
+}
+#member-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    text-align: left;
+}
+#member-list li {
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+}
+#member-list a {
+    word-break: break-all;
+    margin-left: 10px;
+    color: #0056b3;
+}
+
+/* Calendar Styles */
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+.calendar-header {
+    font-weight: bold;
+    padding: 12px 5px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    font-size: 1em;
+}
+.sunday-header {
+    background-color: #dc3545;
+    color: white;
+}
+.calendar-cell {
+    padding: 10px 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
+    position: relative;
+    cursor: pointer;
+    font-size: 0.85em;
+    overflow: hidden;
+}
+.my-absence {
+    border: 2px solid #32cd32; /* Verde Lima (más vivo) */
+}
+.day-number {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+.cell-info {
+    font-size: 0.95em;
+    line-height: 1.3;
+}
+.absent-person {
+    font-weight: bold;
+    color: #ff1493; /* Rosa oscuro (más vivo) */
+    font-size: 1em;
+}
+
+/* Colores de Turno */
+.shift-libre { background-color: #76ff7a; } /* Verde claro */
+.shift-mañana { background-color: #ffeb3b; } /* Amarillo */
+.shift-noche { background-color: #2196f3; } /* Azul */
+.shift-saliente { background-color: #9e9e9e; } /* Gris */
+.shift-tarde { background-color: #9c27b0; } /* Púrpura */
+
+.holiday {
+    position: relative;
+}
+.holiday::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #ff4500; /* Naranja rojizo */
+    border-radius: 4px 4px 0 0;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    padding: 30px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 550px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-out;
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 36px;
+    font-weight: bold;
+    line-height: 1;
+}
+.close-button:hover, .close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.flex-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+#delete-modal-btn, #delete-all-btn {
+    background-color: #dc3545;
+}
+#save-modal-btn, #submit-modal-btn, #manage-absences-btn {
+    background-color: #28a745;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+label {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: -10px;
+}
+input, select, button {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1.1em;
+    box-sizing: border-box;
+}
+.alert {
+    background-color: #ffdddd;
+    color: #d8000c;
+    padding: 15px;
+    border: 1px solid #ff0000;
+    border-radius: 5px;
+    margin-top: 25px;
+    font-weight: bold;
+    display: none;
+    font-size: 1.1em;
+}
