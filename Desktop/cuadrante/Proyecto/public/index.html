@@ -132,22 +132,23 @@
         </div>
     </div>
     
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <!-- Asegúrate de usar los módulos de Firebase más recientes -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <script>
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyCPMQBgYe3hsytMqyJ_T-wiYoSJTNtuwD0",
+            authDomain: "cuadrante-64e6c.firebaseapp.com",
+            projectId: "cuadrante-64e6c",
+            storageBucket: "cuadrante-64e6c.firebasestorage.app",
+            messagingSenderId: "457600146765",
+            appId: "1:457600146765:web:70f7adcb513654cef7ab04"
         };
         
-        // Inicializa Firebase y almacena la app en una variable global
-        window.firebaseApp = firebase.initializeApp(firebaseConfig);
+        // Inicializa Firebase
+        const app = initializeApp(firebaseConfig);
     </script>
     
     <script src="script.js" type="module"></script>
