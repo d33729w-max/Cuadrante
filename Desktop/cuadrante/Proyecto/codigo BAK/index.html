@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuadrante</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-section" class="screen">
+        <h1 class="auth-title">Inicia sesión para continuar</h1>
+        <button id="google-login-btn" class="google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+            Iniciar sesión con Google
+        </button>
+        <div id="auth-alerts" class="alert-message"></div>
+    </div>
+
+    <div id="onboarding-modal" class="modal-container hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">¡Bienvenido!</h2>
+            <p>Parece que es tu primera vez aquí. ¿Qué quieres hacer?</p>
+            <div class="onboarding-options">
+                <button id="create-new-squad-btn" class="onboarding-btn">Crear un nuevo cuadrante</button>
+                <button id="join-existing-squad-btn" class="onboarding-btn">Unirme a uno existente</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pending-modal" class="modal-container hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Solicitud enviada</h2>
+            <p>Hemos enviado una solicitud al administrador del cuadrante. Por favor, espera a que te apruebe.</p>
+        </div>
+    </div>
+
+    <div id="admin-section" class="screen hidden">
+        <div class="header">
+            <div class="user-info">
+                <span>Sesión iniciada como: <strong id="current-user-display"></strong></span>
+                <span id="app-version-display"></span>
+            </div>
+            <button id="logout-btn" class="logout-btn">Cerrar sesión</button>
+        </div>
+        <div class="content-panel">
+            <h2>Panel de Administrador</h2>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h3>Crear Nuevo Cuadrante</h3>
+                    <input type="text" id="squad-name-input" placeholder="Nombre del cuadrante">
+                    <input type="text" id="admin-name-input" placeholder="Tu nombre como administrador">
+                    <input type="text" id="cadencia-input" placeholder="Ej: L,L,N,N,T,D,D">
+                    <input type="date" id="start-date-turnos">
+                    <button id="create-squad-btn">Crear</button>
+                </div>
+                <div class="admin-card">
+                    <h3>Añadir Miembro</h3>
+                    <input type="text" id="new-member-input" placeholder="Nombre del nuevo miembro">
+                    <button id="add-member-btn">Añadir</button>
+                    <ul id="member-list"></ul>
+                </div>
+                <div class="admin-card">
+                    <h3>Solicitudes Pendientes</h3>
+                    <ul id="pending-requests-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="calendar-section" class="screen hidden">
+        <div class="header">
+            <div class="user-info">
+                <span>Sesión iniciada como: <strong id="current-user-display-2"></strong></span>
+                <span id="app-version-display-2"></span>
+            </div>
+            <button id="logout-btn-2" class="logout-btn">Cerrar sesión</button>
+        </div>
+        <div class="calendar-nav">
+            <button id="prev-month">Anterior</button>
+            <h2 id="current-month-year"></h2>
+            <button id="next-month">Siguiente</button>
+        </div>
+        <div class="calendar-grid"></div>
+    </div>
+
+    <div id="day-details-modal" class="modal-container hidden">
+        <div class="modal-content">
+            <h2 id="day-details-title"></h2>
+            <div id="day-details-info"></div>
+            <div class="modal-actions">
+                <button id="manage-absences-btn">Gestionar Ausencias</button>
+                <button class="close-button">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="single-day-modal" class="modal-container hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Añadir/Eliminar Ausencia</h2>
+            <form id="absence-form">
+                <label for="person-name-day">Persona:</label>
+                <select id="person-name-day"></select>
+                
+                <label for="absence-type-day">Tipo de Ausencia:</label>
+                <select id="absence-type-day">
+                    <option value="solicitud-vacaciones">Solicitud de Vacaciones</option>
+                    <option value="vacaciones">Vacaciones</option>
+                    <option value="solicitud-asuntos-particulares">Solicitud Asuntos Particulares</option>
+                    <option value="asuntos-particulares">Asuntos Particulares</option>
+                    <option value="juicio">Juicio</option>
+                    <option value="comision-servicio">Comisión de Servicio</option>
+                    <option value="tiro">Tiro</option>
+                    <option value="reconocimiento-medico">Reconocimiento Médico</option>
+                    <option value="baja-medica">Baja Médica</option>
+                    <option value="indisposicion">Indisposición</option>
+                </select>
+
+                <label for="start-date-modal">Fecha de inicio:</label>
+                <input type="date" id="start-date-modal" required>
+
+                <label for="end-date-modal">Fecha de fin:</label>
+                <input type="date" id="end-date-modal" required>
+
+                <div class="modal-alerts" id="modal-alerts"></div>
+            </form>
+            <div class="modal-actions">
+                <button id="save-modal-btn">Guardar</button>
+                <button id="delete-modal-btn">Eliminar</button>
+                <button id="close-single-day-modal" class="close-button">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_AUTH_DOMAIN",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_STORAGE_BUCKET",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+        
+        // Inicializa Firebase y almacena la app en una variable global
+        window.firebaseApp = firebase.initializeApp(firebaseConfig);
+    </script>
+    
+    <script src="script.js" type="module"></script>
+</body>
+</html>
